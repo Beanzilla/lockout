@@ -165,7 +165,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
             if lockout.settings.server_pass ~= "" and string.byte(fields.pass) ~= string.byte(lockout.settings.server_pass) then
                 local pname = player:get_player_name()
                 if not minetest.check_player_privs(pname, {server = true}) and pname ~= "singleplayer" then
-                    minetest.disconnect_player(pname, lockout.settings.wrong_server_pass_txt)
+                    minetest.kick_player(pname, lockout.settings.wrong_server_pass_txt)
                 end
                 minetest.log("warning", "[lockout] '"..pname.."' attempted to login with invalid server password, '"..fields.pass.."'.")
             end
@@ -181,7 +181,7 @@ minetest.register_on_joinplayer(function (name, ip)
     end
     if lockout.settings.demand_server == true then
         if not minetest.check_player_privs(name,  {server=true}) then
-            minetest.disconnect_player(pname, lockout.settings.demand_server_txt)
+            minetest.kick_player(pname, lockout.settings.demand_server_txt)
         end
     else
         if lockout.settings.whitelist_mode == true then
@@ -193,7 +193,7 @@ minetest.register_on_joinplayer(function (name, ip)
                 end
             end
             if check == false then
-                minetest.disconnect_player(pname, lockout.settings.whitelisted_txt)
+                minetest.kick_player(pname, lockout.settings.whitelisted_txt)
             end
         end
         if lockout.settings.server_pass ~= "" then
