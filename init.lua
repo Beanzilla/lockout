@@ -174,14 +174,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 -- If in demand server priv mode or whitelist mode then perform these pre-checks
-minetest.register_on_prejoinplayer(function (name, ip)
+minetest.register_on_joinplayer(function (name, ip)
     lockout.load_settings()
     if minetest.check_player_privs(name, {server = true}) and name == "singleplayer" then
         return
     end
     if lockout.settings.demand_server == true then
         if not minetest.check_player_privs(name,  {server=true}) then
-            return lockout.settings.demand_server_txt
+            minetest.disconnect_player(pname, lockout.settings.demand_server_txt)
         end
     else
         if lockout.settings.whitelist_mode == true then
@@ -193,18 +193,14 @@ minetest.register_on_prejoinplayer(function (name, ip)
                 end
             end
             if check == false then
-                return lockout.settings.whitelisted_txt
+                minetest.disconnect_player(pname, lockout.settings.whitelisted_txt)
             end
         end
-    end
-end)
-
--- After the player has already connected to a degree show them the password prompt only if it's set
-minetest.register_on_joinplayer(function (name, ip, success)
-    if lockout.settings.server_pass ~= "" then
-        if not minetest.check_player_privs(pname, {server = true}) and pname ~= "singleplayer" then
-            minetest.log("action", "[lockout] Showing Server Password to '"..name:get_player_name().."'...")
-            lockout.show_svr_pass(name:get_player_name())
+        if lockout.settings.server_pass ~= "" then
+            if not minetest.check_player_privs(pname, {server = true}) and pname ~= "singleplayer" then
+                minetest.log("action", "[lockout] Showing Server Password to '"..name:get_player_name().."'...")
+                lockout.show_svr_pass(name:get_player_name())
+            end
         end
     end
 end)
