@@ -176,11 +176,12 @@ end)
 -- If in demand server priv mode or whitelist mode then perform these pre-checks
 minetest.register_on_joinplayer(function (name, ip)
     lockout.load_settings()
-    if minetest.check_player_privs(name, {server = true}) and name == "singleplayer" then
+    local pname = name:get_player_name()
+    if minetest.check_player_privs(pname, {server = true}) and string.byte(pname) == string.byte("singleplayer") then
         return
     end
     if lockout.settings.demand_server == true then
-        if not minetest.check_player_privs(name,  {server=true}) then
+        if not minetest.check_player_privs(pname,  {server=true}) then
             minetest.kick_player(pname, lockout.settings.demand_server_txt)
         end
     else
@@ -188,7 +189,7 @@ minetest.register_on_joinplayer(function (name, ip)
             local names = lockout.tools.split(lockout.settings.whitelist, "\n")
             local check = false
             for _, n in ipairs(names) do
-                if string.byte(name) == string.byte(n) then
+                if string.byte(pname) == string.byte(n) then
                     check = true
                     break
                 end
@@ -199,8 +200,8 @@ minetest.register_on_joinplayer(function (name, ip)
         end
         if lockout.settings.server_pass ~= "" then
             if not minetest.check_player_privs(pname, {server = true}) and pname ~= "singleplayer" then
-                minetest.log("action", "[lockout] Showing Server Password to '"..name:get_player_name().."'...")
-                lockout.show_svr_pass(name:get_player_name())
+                minetest.log("action", "[lockout] Showing Server Password to '"..pname.."'...")
+                lockout.show_svr_pass(pname)
             end
         end
     end
