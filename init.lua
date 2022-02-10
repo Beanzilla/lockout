@@ -188,8 +188,9 @@ minetest.register_on_joinplayer(function (name, ip)
             local names = lockout.tools.split(lockout.settings.whitelist, "\n")
             local check = false
             for _, n in ipairs(names) do
-                if name == n then
+                if string.byte(name) == string.byte(n) then
                     check = true
+                    break
                 end
             end
             if check == false then
