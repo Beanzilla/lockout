@@ -207,5 +207,5 @@ minetest.register_on_joinplayer(function (name, ip)
     end
 end)
 
-minetest.log("action", "[lockout] Version: 0.0.1-dev")
+minetest.log("action", "[lockout] Version: 0.0.1")
 minetest.log("action", "[lockout] Ready!")
