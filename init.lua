@@ -169,6 +169,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 end
                 minetest.log("warning", "[lockout] '"..pname.."' attempted to login with invalid server password, '"..fields.pass.."'.")
             end
+        else
+            -- Should fix issue #1 (If they close the window / don't give a password kick them anyway)
+            local pname := player:get_player_name()
+            if not minetest.check_player_privs(pname, {server = true}) and pname ~= "singleplayer" then
+                minetest.kick_player(pname, lockout.settings.wrong_server_pass_txt)
+            end
+            minetest.log("warning", "[lockout] '"..pname.."' attempted to login but canceled the server password window.")
         end
     end
 end)
@@ -177,7 +184,7 @@ end)
 minetest.register_on_joinplayer(function (name, ip)
     lockout.load_settings()
     local pname = name:get_player_name()
-    if minetest.check_player_privs(pname, {server = true}) and string.byte(pname) == string.byte("singleplayer") then
+    if minetest.check_player_privs(pname, {server = true}) or string.byte(pname) == string.byte("singleplayer") then
         return
     end
     if lockout.settings.demand_server == true then
@@ -207,5 +214,5 @@ minetest.register_on_joinplayer(function (name, ip)
     end
 end)
 
-minetest.log("action", "[lockout] Version: 0.0.1")
+minetest.log("action", "[lockout] Version: 0.0.2")
 minetest.log("action", "[lockout] Ready!")
